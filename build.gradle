@@ -1,0 +1,37 @@
+plugins {
+    id 'java'
+    id("maven-publish")
+}
+
+group 'party.liyin'
+version '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/" + System.getenv("GITHUB_REPOSITORY"))
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
+
+dependencies {
+    implementation group: 'org.javassist', name: 'javassist', version: '3.27.0-GA'
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot', version: '2.4.2'
+    testImplementation group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.27'
+    testImplementation group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.27'
+}
