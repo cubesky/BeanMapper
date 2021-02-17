@@ -23,7 +23,8 @@ publishing {
     }
     publications {
         gpr(MavenPublication) {
-            from(components.java)
+            artifactId 'beanmapper'
+            from components.java
         }
     }
 }
