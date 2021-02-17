@@ -87,6 +87,16 @@ public class Test {
     }
 
     @org.junit.Test
+    public void conflictTest() throws BeanMapperException {
+        BaseClass base = new BaseClass(1, "A");
+        TargetClass target = new TargetClass();
+        BeanMapper mapper = new BeanMapper(BaseClass.class, TargetClass.class);
+        BeanMapper mapperConflict = new BeanMapper(BaseClass.class, TargetClass.class);
+        mapper.copy(base, target);
+        mapperConflict.copy(base, target);
+    }
+
+    @org.junit.Test
     public void timeTest() throws BeanMapperException {
         final BaseClass base = new BaseClass(1, "A");
         System.out.println("Test for 10000000 times bean copy.");
