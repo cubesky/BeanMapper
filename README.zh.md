@@ -11,7 +11,7 @@ BeanMapper 通过 javassist 类库实现在运行时直接生成字节码来转�
  * 类必须是公共可见的，否则会发生访问错误。
 
 ## 导入
-预编译包会被 CI 自动发布到 Github Package 上，直接从 Github Package 引用即可。
+预编译包会被 CI 自动发布到 Maven Central 上，直接从 Maven Central 引用即可。
 
 ## 使用
 BeanMapper 库提供两个 BeanMapper 供您使用。
@@ -32,17 +32,22 @@ BeanMapper 需要您创建实例来进行维护，一个 BeanMapper 实例仅能
 
 避免多次自动创建类造成冲突崩溃。
 
-BeanMapper 有2个构造函数，当使用无参构造方法时，转换类生成工作将会被推迟到首次使用时。
-```java
-BeanMapper mapper = new BeanMapper();
-mapper.copy(source, target)
-```
-
-您也可以使用有参构造方法，在构造时进行创建。
+BeanMapper 有构造函数，在构造时进行创建。
 ```java
 BeanMapper mapper = new BeanMapper(Source.class, Target.class);
 mapper.copy(source, target)
 ```
+
+### BeanMapperInPlace
+BeanMapperInPlace 是一个在运行时向您的 Java Bean 添加属性的魔法类。您只需要提供原始类和需要添加的属性列表即可。原始类和增加类型的转换器将视为同一个。
+```java
+BeanMapperInPlace vMapper = new BeanMapperInPlace(Source.class, Stream.of(new BeanMapperInPlace.TypePair("three", double.class)).collect(Collectors.toList()));
+List<BeanMapperInPlace.DataPair> dataPairs = new ArrayList<>();
+dataPairs.add(new BeanMapperInPlace.DataPair("three", 1.2));
+Source target = vMapper.copy(base, dataPairs);
+```
+然后您就会得到已转换为您原始类型的对象，这个对象已经具有您想要添加的内容。
+
 ## 效率
 在 10000000 次复制测试中
 
@@ -51,5 +56,7 @@ BeanUtils.copyProperties 用时 9809 毫秒
 StaticBeanMapper.copy 用时 100毫秒（首次编译）+ 3633 毫秒（后续 10000000 次调用）
 
 BeanMapper.copy 用时 98毫秒（首次编译）+ 1641 毫秒（后续 10000000 次调用）
+
+BeanMapperInPlace.copy 用时 19毫秒（首次编译）+ 1710 毫秒（后续 10000000 次调用）
 
 手写 setter 用时 1479 毫秒

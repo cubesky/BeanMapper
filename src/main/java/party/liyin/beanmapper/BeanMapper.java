@@ -10,19 +10,17 @@ public class BeanMapper {
     private String sourceClass = "";
     private String targetClass = "";
     private Object mapper = null;
-    public BeanMapper(){}
     public BeanMapper(Class<?> source, Class<?> target) throws BeanMapperException {
         try {
             compile(source, target);
         } catch (CannotCompileException | InstantiationException | NotFoundException | IllegalAccessException e) {
             throw new BeanMapperException(e);
         }
-
     }
     private void compile(Class<?> source, Class<?> target) throws NotFoundException, CannotCompileException, IllegalAccessException, InstantiationException {
         sourceClass = source.getName();
         targetClass = target.getName();
-        String className = "T" + (source.getName() + " " + target.getName()).hashCode();
+        String className = ("T" + (source.getName() + " " + target.getName()).hashCode()).replace("-", "U");
         if (cache.containsKey(className)) {
             mapper = cache.get(className);
         } else {
@@ -53,18 +51,10 @@ public class BeanMapper {
     }
 
     public void copy(Object source, Object target) throws BeanMapperException {
-        try {
-            if (mapper != null) {
-                if (!sourceClass.equals(source.getClass().getName()) || !targetClass.equals(target.getClass().getName())) {
-                    throw new BeanMapperException(new IllegalArgumentException());
-                }
-            } else {
-                compile(source.getClass(), target.getClass());
-            }
-            ((BeanCopyable)mapper).copy(source, target);
-        } catch (CannotCompileException | NotFoundException | IllegalAccessException | InstantiationException e) {
-            throw new BeanMapperException(e);
+        if (!sourceClass.equals(source.getClass().getName()) || !targetClass.equals(target.getClass().getName())) {
+            throw new BeanMapperException(new IllegalArgumentException());
         }
+        ((BeanCopyable)mapper).copy(source, target);
     }
 
     public String getSourceClass() {

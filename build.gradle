@@ -1,10 +1,18 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
 plugins {
     id 'java'
-    id("maven-publish")
+    id 'maven'
+    id "maven-publish"
+    id 'signing'
 }
 
 group 'party.liyin'
-version '1.0.1'
+version '1.0.2'
 
 repositories {
     mavenCentral()
@@ -27,6 +35,76 @@ publishing {
             from components.java
         }
     }
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: System.getenv("OSSRH_USERNAME"), password: System.getenv("OSSRH_PASSWORD"))
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+                authentication(userName: System.getenv("SONATYPE_USERNAME"), password: System.getenv("SONATYPE_PASSWORD"))
+            }
+
+            pom.project {
+                name project.name
+                packaging 'jar'
+                description 'A faster BeanUtils.copyProperties replacement'
+                url 'https://github.com/cubesky/BeanMapper'
+
+                scm {
+                    url 'https://github.com/cubesky/BeanMapper'
+                    connection 'https://github.com/cubesky/BeanMapper.git'
+                    developerConnection 'git@github.com:cubesky/BeanMapper.git'
+                }
+
+                licenses {
+                    license {
+                        name 'MIT Licence'
+                        url 'https://raw.githubusercontent.com/cubesky/BeanMapper/master/LICENSE'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'cubesky'
+                        name 'CubeSky'
+                        email 'edge4chaos+sonatype@gmail.com'
+                    }
+                }
+            }
+        }
+    }
+}
+
+signing {
+    required { gradle.taskGraph.hasTask("uploadArchives") }
+    def signingKeyId = System.getenv("SIGN_KEY_ID")
+    def signingKey = System.getenv("SIGN_KEY")
+    def signingPassword = System.getenv("SIGN_PWD")
+    useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
+    sign configurations.archives
+}
+
+task sourcesJar(type: Jar) {
+    archiveClassifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    archiveClassifier = 'javadoc'
+    from 'build/docs/javadoc'
+}
+
+artifacts {
+    archives jar
+    archives sourcesJar
+    archives javadocJar
 }
 
 dependencies {

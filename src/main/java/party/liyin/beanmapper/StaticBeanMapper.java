@@ -16,7 +16,7 @@ public class StaticBeanMapper {
     }
     public static void copy(Object source, Object target) throws BeanMapperException {
         try {
-            String className = "T" + (source.getClass().getName() + " " + target.getClass().getName()).hashCode();
+            String className = ("T" + (source.getClass().getName() + " " + target.getClass().getName()).hashCode()).replace("-", "U");
             Object clazz;
             if (classMap.containsKey(className)) {
                 clazz = classMap.get(className);
