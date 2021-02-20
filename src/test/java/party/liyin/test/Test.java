@@ -113,6 +113,8 @@ public class Test {
         ArrayList<BeanMapperInPlace.DataPair> dataPairs = new ArrayList<>();
         dataPairs.add(new BeanMapperInPlace.DataPair("test", 10));
         BaseClass nbC = virtual.copy(base, dataPairs);
+        System.out.println(base.getClass().getName());
+        System.out.println(nbC.getClass().getName());
         System.out.println(nbC.getOne());
         System.out.println(nbC.getTwo());
         Arrays.stream(nbC.getClass().getDeclaredFields()).forEach(u -> {

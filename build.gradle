@@ -37,6 +37,18 @@ publishing {
     }
 }
 
+
+signing {
+    required {
+        gradle.taskGraph.hasTask(uploadArchives)
+    }
+    def signingKeyId = System.getenv("SIGN_KEY_ID")
+    def signingKey = System.getenv("SIGN_KEY")
+    def signingPassword = System.getenv("SIGN_PWD")
+    useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
+    sign configurations.archives
+}
+
 uploadArchives {
     repositories {
         mavenDeployer {
@@ -72,9 +84,9 @@ uploadArchives {
 
                 developers {
                     developer {
-                        id 'cubesky'
-                        name 'CubeSky'
-                        email 'edge4chaos+sonatype@gmail.com'
+                        id = 'cubesky'
+                        name = 'CubeSky'
+                        email = 'edge4chaos+sonatype@gmail.com'
                     }
                 }
             }
@@ -82,29 +94,20 @@ uploadArchives {
     }
 }
 
-signing {
-    required { gradle.taskGraph.hasTask("uploadArchives") }
-    def signingKeyId = System.getenv("SIGN_KEY_ID")
-    def signingKey = System.getenv("SIGN_KEY")
-    def signingPassword = System.getenv("SIGN_PWD")
-    useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
-    sign configurations.archives
-}
-
 task sourcesJar(type: Jar) {
-    archiveClassifier = 'sources'
+    classifier = 'sources'
     from sourceSets.main.allSource
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    archiveClassifier = 'javadoc'
-    from 'build/docs/javadoc'
+    classifier = 'javadoc'
+    from javadoc
 }
 
 artifacts {
     archives jar
-    archives sourcesJar
     archives javadocJar
+    archives sourcesJar
 }
 
 dependencies {
