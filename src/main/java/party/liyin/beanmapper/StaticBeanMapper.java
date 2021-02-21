@@ -3,6 +3,7 @@ package party.liyin.beanmapper;
 import javassist.*;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 
 public class StaticBeanMapper {
@@ -33,8 +34,10 @@ public class StaticBeanMapper {
                 builder.append("{");
                 Field[] sField = source.getClass().getDeclaredFields();
                 for (Field field: sField) {
-                    String uField = toFirstUpper(field.getName());
-                    builder.append("$2.set").append(uField).append("($1.get").append(uField).append("());");
+                    if (!Modifier.isStatic(field.getModifiers())) {
+                        String uField = toFirstUpper(field.getName());
+                        builder.append("$2.set").append(uField).append("($1.get").append(uField).append("());");
+                    }
                 }
                 builder.append("}");
                 wMethod.setBody(builder.toString());

@@ -90,8 +90,10 @@ public class BeanMapperInPlace {
             builder.append("{");
             Field[] sField = source.getDeclaredFields();
             for (Field field: sField) {
-                String uField = StaticBeanMapper.toFirstUpper(field.getName());
-                builder.append("$2.set").append(uField).append("($1.get").append(uField).append("());");
+                if (!java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
+                    String uField = StaticBeanMapper.toFirstUpper(field.getName());
+                    builder.append("$2.set").append(uField).append("($1.get").append(uField).append("());");
+                }
             }
             builder.append("}");
             wMethod.setBody(builder.toString());
